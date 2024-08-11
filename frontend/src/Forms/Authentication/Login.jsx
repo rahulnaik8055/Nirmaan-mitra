@@ -39,6 +39,7 @@ const Login = () => {
         const { success, message } = data;
         if (success) {
           showMessage("Login successful!", "success"); // Show success message
+          console.log(data);
           setTimeout(() => {
             navigate("/");
           }, 1000);
