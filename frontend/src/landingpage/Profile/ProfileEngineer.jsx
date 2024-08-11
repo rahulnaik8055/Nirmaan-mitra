@@ -8,7 +8,7 @@ import config from "../../../config";
 const ProfileEngineer = () => {
   const [profile, setProfile] = useState(null);
   const [projects, setProjects] = useState([]);
-  const [cookies] = useCookies(["token"]);
+  const [cookies] = useCookies([]);
 
   useEffect(() => {
     if (!cookies.token) return;
