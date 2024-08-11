@@ -34,7 +34,7 @@ const Login = () => {
           {
             ...inputValue,
           },
-          {withCredentials: true}
+          {withCredentials: 'include'}
         );
         const { success, message } = data;
         if (success) {
