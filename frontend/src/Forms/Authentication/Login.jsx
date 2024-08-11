@@ -34,12 +34,14 @@ const Login = () => {
           {
             ...inputValue,
           },
-          {withCredentials: 'include'}
+          { withCredentials: "include" }
         );
-        const { success, message } = data;
+        const { success, message, token } = data; // Assuming your backend sends the token in the response
         if (success) {
           showMessage("Login successful!", "success"); // Show success message
           console.log(data);
+          // Store the token in local storage
+          localStorage.setItem("token", token);
           setTimeout(() => {
             navigate("/");
           }, 1000);
