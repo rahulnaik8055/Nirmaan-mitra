@@ -8,7 +8,7 @@ const useVerifyCookie = () => {
   const [userId, setUserId] = useState(null);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [cookies, removeCookie] = useCookies(["token"]);
+  const [cookies, removeCookie] = useCookies([]);
   const navigate = useNavigate();
 
   useEffect(() => {
