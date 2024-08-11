@@ -40,6 +40,7 @@ const Login = () => {
         if (success) {
           showMessage("Login successful!", "success"); // Show success message
           console.log(data);
+          console.log(token);
           // Store the token in local storage
           localStorage.setItem("token", token);
           setTimeout(() => {
