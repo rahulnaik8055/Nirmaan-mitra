@@ -34,7 +34,7 @@ const Login = () => {
           {
             ...inputValue,
           },
-           withCredentials: true
+          {withCredentials: true}
         );
         const { success, message } = data;
         if (success) {
