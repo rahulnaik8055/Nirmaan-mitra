@@ -30,7 +30,7 @@ const Login = () => {
     } else {
       try {
         const { data } = await axios.post(
-          `${config.apiBaseUrl}/login`,
+          "http://localhost:3000/login",
           {
             ...inputValue,
           },
