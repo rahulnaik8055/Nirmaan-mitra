@@ -22,37 +22,50 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    if (form.checkValidity() === false) {
-      e.stopPropagation();
-    } else {
-      try {
-        const { data } = await axios.post(
-          `${config.apiBaseUrl}/login`,
-          {
-            ...inputValue,
-          },
-          { withCredentials: true }
-        );
-        const { success, message ,token} = data;
-        if (success) {
-          showMessage("Login successful!", "success"); // Show success message
-          console.log(token);
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  const form = e.currentTarget;
+  if (form.checkValidity() === false) {
+    e.stopPropagation();
+  } else {
+    try {
+      const { data } = await axios.post(
+        `${config.apiBaseUrl}/login`,
+        {
+          ...inputValue,
+        },
+        { withCredentials: true }
+      );
+
+      console.log("Response data:", data); // Debugging: Log the entire response
+
+      const { success, message, token } = data;
+
+      if (success) {
+        showMessage("Login successful!", "success"); // Show success message
+        console.log("Token:", token); // Debugging: Log the token
+
+        // If the token is undefined, this will help you determine the exact issue
+        if (token) {
+          localStorage.setItem("token", token); // Store the token in local storage
         } else {
-          showMessage(message, "error"); // Show error message
+          console.error("Token is undefined. Check the response structure.");
         }
-      } catch (error) {
-        showMessage("An error occurred while logging in.", "error"); // Show error message
-        console.error(error);
+
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      } else {
+        showMessage(message, "error"); // Show error message
       }
+    } catch (error) {
+      showMessage("An error occurred while logging in.", "error"); // Show error message
+      console.error(error);
     }
-    setValidated(true);
-  };
+  }
+  setValidated(true);
+};
+
 
   return (
     <div className="container mt-5 margin">
