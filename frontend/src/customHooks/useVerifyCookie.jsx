@@ -12,7 +12,6 @@ const useVerifyCookie = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(cookies);
     const verifyCookie = async () => {
       if (!cookies.token) {
         navigate("/login");
