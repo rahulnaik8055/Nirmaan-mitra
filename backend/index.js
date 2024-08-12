@@ -42,16 +42,16 @@ const storage = new CloudinaryStorage({
 const parser = multer({ storage: storage });
 
 app.use(bodyParser.json());
+app.use(express.json());
+app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["https://nirmaan-mitra-frontend.onrender.com"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
-app.use(express.json());
-app.use(cookieParser());
 
 // Function to perform geocoding using Mapbox API
 const geocode = async (location) => {
