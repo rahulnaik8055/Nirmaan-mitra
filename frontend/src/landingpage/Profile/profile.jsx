@@ -11,7 +11,7 @@ import config from "../../../config";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [cookies, removeCookie] = useCookies(["token"]);
+  const [cookies, removeCookie] = useCookies([]);
   const [username, setUsername] = useState("");
   const [role, setRole] = useState("");
   const [userId, setUserId] = useState("");

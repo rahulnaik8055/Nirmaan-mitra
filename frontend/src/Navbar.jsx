@@ -7,7 +7,7 @@ import { useFlashMessage } from "./OtherComponents/FlashMessageContext";
 import config from "../config";
 
 function Navbar() {
-  const [cookies] = useCookies(["token"]);
+  const [cookies,removeCookie] = useCookies([]);
   const { role } = useVerifyCookie();
   const { showMessage } = useFlashMessage();
 
@@ -26,7 +26,7 @@ function Navbar() {
     axios
       .get(`${config.apiBaseUrl}/logout`, { withCredentials: true })
       .then((res) => {
-        localStorage.removeItem("token");
+        removeCookie("token");
         showMessage("Logged out successfully", "success");
       })
       .catch((err) => {

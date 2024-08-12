@@ -1,25 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useFlashMessage } from "../../OtherComponents/FlashMessageContext";
 import config from "../../../config";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { showMessage } = useFlashMessage(); // Use the custom hook for flash messages
-  const [inputValue, setInputValue] = useState({
-    email: "",
-    password: "",
-  });
-  const { email, password } = inputValue;
+  const { showMessage } = useFlashMessage();
+  const [inputValue, setInputValue] = useState({ email: "", password: "" });
   const [validated, setValidated] = useState(false);
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
-    setInputValue({
-      ...inputValue,
-      [name]: value,
-    });
+    setInputValue({ ...inputValue, [name]: value });
   };
 
   const handleSubmit = async (e) => {
@@ -31,23 +24,20 @@ const Login = () => {
       try {
         const { data } = await axios.post(
           `${config.apiBaseUrl}/login`,
-          {
-            ...inputValue,
-          },
+          inputValue,
           { withCredentials: true }
         );
-        const { success, message } = data;
+        const { success, message, token } = data;
         if (success) {
           showMessage("Login successful!", "success"); // Show success message
-
           setTimeout(() => {
             navigate("/");
           }, 1000);
         } else {
-          showMessage(message, "error"); // Show error message
+          showMessage(message, "error");
         }
       } catch (error) {
-        showMessage("An error occurred while logging in.", "error"); // Show error message
+        showMessage("An error occurred while logging in.", "error");
         console.error(error);
       }
     }
@@ -74,7 +64,7 @@ const Login = () => {
                 type="email"
                 className="form-control"
                 name="email"
-                value={email}
+                value={inputValue.email}
                 placeholder="Enter your email"
                 onChange={handleOnChange}
                 id="email"
@@ -92,7 +82,7 @@ const Login = () => {
                 type="password"
                 className="form-control"
                 name="password"
-                value={password}
+                value={inputValue.password}
                 placeholder="Enter your password"
                 id="password"
                 onChange={handleOnChange}
@@ -103,9 +93,6 @@ const Login = () => {
             <button type="submit" className="btn btn-warning">
               Login
             </button>
-            <span className="ms-3">
-              Create new Account <Link to={"/signup"}>Signup</Link>
-            </span>
           </form>
         </div>
       </div>

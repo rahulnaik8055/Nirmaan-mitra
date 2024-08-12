@@ -7,7 +7,7 @@ import config from "../../../config";
 
 const ProfileEmployer = () => {
   const [profile, setProfile] = useState(null);
-  const [cookies] = useCookies(["token"]);
+  const [cookies] = useCookies([]);
 
   // Fetch profile once the user is verified
   useEffect(() => {
