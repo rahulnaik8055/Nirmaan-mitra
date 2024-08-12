@@ -21,13 +21,12 @@ module.exports.Signup = async (req, res) => {
 
     const token = createSecretToken(user._id);
 
-    // Set cookie options
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production", // Adjust based on environment
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 24 * 60 * 60 * 1000,
-      path: "/",
+      path: "/", // Ensure the path matches the path used when setting the cookie
     };
 
     res.cookie("token", token, cookieOptions);
@@ -87,12 +86,11 @@ module.exports.Login = async (req, res) => {
 
 module.exports.Logout = async (req, res) => {
   try {
-    // Clear the cookie
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      path: "/",
+      path: "/", // Ensure the path matches the path used when setting the cookie
     };
 
     res.clearCookie("token", cookieOptions);
