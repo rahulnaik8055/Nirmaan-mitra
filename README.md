@@ -51,7 +51,7 @@ npm start
 #Backend
 Clone the Repository:
 
-git clone https://github.com/yourusername/nirmaan-mitra-backend.git
+git clone https://github.com/yourusername/Nirmaan-Mitra-backend.git
 
 cd nirmaan-mitra-backend
 
