@@ -1,7 +1,7 @@
-Nirmaan Mitra
+#Nirmaan Mitra
 Nirmaan Mitra is a comprehensive platform designed to connect engineers with employers, offering a streamlined interface for job applications and recruitment processes. This project includes a frontend and backend deployed separately to enhance scalability and maintainability.
 
-Table of Contents
+#Table of Contents
 Features
 Technologies
 Setup
@@ -11,18 +11,22 @@ Deployment
 Usage
 Contributing
 License
-Features
+
+#Features
 User Signup and Login: Secure user authentication with JWT tokens.
 Job Listings: Employers can post job opportunities, and engineers can browse and apply for jobs.
 Profile Management: Users can manage their profiles and application statuses.
 Notifications: Real-time updates for application statuses and job postings.
-Technologies
+
+#Technologies
 Frontend: React, CSS, Axios
 Backend: Node.js, Express, MongoDB
 Authentication: JWT, bcryptjs
 Deployment: Render (for separate deployment of frontend and backend)
-Setup
-Frontend
+
+#Setup
+
+#Frontend
 Clone the Repository:
 
 git clone https://github.com/yourusername/nirmaan-mitra-frontend.git
@@ -44,7 +48,7 @@ Run the Development Server:
 
 npm start
 
-Backend
+#Backend
 Clone the Repository:
 
 git clone https://github.com/yourusername/nirmaan-mitra-backend.git
@@ -68,11 +72,13 @@ Run the Development Server:
 
 npm start
 
-Deployment
-Frontend Deployment
+#Deployment
+
+#Frontend Deployment
 Deploy the frontend to a service like Render or Vercel.
 Set the environment variable REACT_APP_API_URL to the URL of your backend.
-Backend Deployment
+
+#Backend Deployment
 Deploy the backend to a service like Render.
 Ensure that environment variables are correctly set in the deployment environment.
 Usage
@@ -86,7 +92,7 @@ Use the signup and login forms to create an account or access your existing acco
 
 Explore Features:
 
-Browse job listings and apply for positions.
+
 Manage your profile and view application statuses.
 Contributing
 Fork the Repository:
@@ -95,7 +101,7 @@ Create a fork of the repository on GitHub.
 
 Clone Your Fork:
 
-git clone https://github.com/yourusername/nirmaan-mitra.git
+git clone https://github.com/rahulnaik8055/nirmaan-mitra.git
 
 Create a Branch:
 
@@ -111,8 +117,7 @@ git push origin feature-branch
 
 Open a pull request on GitHub.
 
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
+
 
 
 
