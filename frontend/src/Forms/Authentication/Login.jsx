@@ -22,39 +22,35 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    if (form.checkValidity() === false) {
-      e.stopPropagation();
-    } else {
-      try {
-        const { data } = await axios.post(
-          "http://localhost:3000/login",
-          {
-            ...inputValue,
-          },
-          { withCredentials: "include" }
-        );
-        const { success, message, token } = data; // Assuming your backend sends the token in the response
-        if (success) {
-          showMessage("Login successful!", "success"); // Show success message
-          console.log(data);
-          console.log(token);
-          // Store the token in local storage
-          localStorage.setItem("token", token);
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
-        } else {
-          showMessage(message, "error"); // Show error message
-        }
-      } catch (error) {
-        showMessage("An error occurred while logging in.", "error"); // Show error message
-        console.error(error);
+
+    try {
+      const response = await fetch('http:localhost:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Include other headers like Authorization if needed.
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Assume the token is returned in the response
+        const { token } = data;
+
+        // Store the token securely
+        localStorage.setItem('token', token);
+
+        // Redirect or update the UI to indicate a successful login
+      } else {
+        setError(data.message || 'Login failed');
       }
+    } catch (error) {
+      setError('An error occurred. Please try again.');
     }
-    setValidated(true);
   };
 
   return (
