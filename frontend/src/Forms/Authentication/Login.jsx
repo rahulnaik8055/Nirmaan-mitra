@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useFlashMessage } from "../../OtherComponents/FlashMessageContext";
@@ -6,7 +6,7 @@ import config from "../../../config";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { showMessage } = useFlashMessage(); // Custom hook for flash messages
+  const { showMessage } = useFlashMessage(); // Use the custom hook for flash messages
   const [inputValue, setInputValue] = useState({
     email: "",
     password: "",
@@ -30,31 +30,24 @@ const Login = () => {
     } else {
       try {
         const { data } = await axios.post(
-          `${config.API_URL}/login`, // Make sure the API URL is correct in your config
+          `${config.apiBaseUrl}/login`,
           {
             ...inputValue,
           },
-          { withCredentials: true } // Include credentials if needed
+          { withCredentials: true }
         );
-        const { success, message, token } = data; // Assuming your backend sends success, message, and token in the response
-
+        const { success, message ,token} = data;
         if (success) {
           showMessage("Login successful!", "success"); // Show success message
-          console.log(data);
           console.log(token);
-
-          // Store the token in local storage
-          localStorage.setItem("token", token);
-
-          // Redirect to the home page or any other route after a delay
           setTimeout(() => {
             navigate("/");
           }, 1000);
         } else {
-          showMessage(message, "error"); // Show error message if login fails
+          showMessage(message, "error"); // Show error message
         }
       } catch (error) {
-        showMessage("An error occurred while logging in.", "error"); // Show error message on failure
+        showMessage("An error occurred while logging in.", "error"); // Show error message
         console.error(error);
       }
     }
