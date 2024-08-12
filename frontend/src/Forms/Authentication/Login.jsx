@@ -1,71 +1,51 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useFlashMessage } from "../../OtherComponents/FlashMessageContext";
 import config from "../../../config";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { showMessage } = useFlashMessage(); // Use the custom hook for flash messages
-  const [inputValue, setInputValue] = useState({
-    email: "",
-    password: "",
-  });
-  const { email, password } = inputValue;
+  const { showMessage } = useFlashMessage();
+  const [inputValue, setInputValue] = useState({ email: "", password: "" });
   const [validated, setValidated] = useState(false);
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
-    setInputValue({
-      ...inputValue,
-      [name]: value,
-    });
+    setInputValue({ ...inputValue, [name]: value });
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  const form = e.currentTarget;
-  if (form.checkValidity() === false) {
-    e.stopPropagation();
-  } else {
-    try {
-      const { data } = await axios.post(
-        `${config.apiBaseUrl}/login`,
-        {
-          ...inputValue,
-        },
-        { withCredentials: true }
-      );
-
-      console.log("Response data:", data); // Debugging: Log the entire response
-
-      const { success, message, token } = data;
-
-      if (success) {
-        showMessage("Login successful!", "success"); // Show success message
-        console.log("Token:", token); // Debugging: Log the token
-
-        // If the token is undefined, this will help you determine the exact issue
-        if (token) {
-          localStorage.setItem("token", token); // Store the token in local storage
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
+    } else {
+      try {
+        const { data } = await axios.post(
+          `${config.apiBaseUrl}/login`,
+          inputValue,
+          { withCredentials: true }
+        );
+        const { success, message, token } = data;
+        if (success) {
+          showMessage("Login successful!", "success");
+          // Store the token in local storage
+          localStorage.setItem("token", token);
+          console.log(token);
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
         } else {
-          console.error("Token is undefined. Check the response structure.");
+          showMessage(message, "error");
         }
-
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
-      } else {
-        showMessage(message, "error"); // Show error message
+      } catch (error) {
+        showMessage("An error occurred while logging in.", "error");
+        console.error(error);
       }
-    } catch (error) {
-      showMessage("An error occurred while logging in.", "error"); // Show error message
-      console.error(error);
     }
-  }
-  setValidated(true);
-};
-
+    setValidated(true);
+  };
 
   return (
     <div className="container mt-5 margin">
@@ -87,7 +67,7 @@ const Login = () => {
                 type="email"
                 className="form-control"
                 name="email"
-                value={email}
+                value={inputValue.email}
                 placeholder="Enter your email"
                 onChange={handleOnChange}
                 id="email"
@@ -105,7 +85,7 @@ const Login = () => {
                 type="password"
                 className="form-control"
                 name="password"
-                value={password}
+                value={inputValue.password}
                 placeholder="Enter your password"
                 id="password"
                 onChange={handleOnChange}
@@ -116,9 +96,6 @@ const Login = () => {
             <button type="submit" className="btn btn-warning">
               Login
             </button>
-            <span className="ms-3">
-              Create new Account <Link to={"/signup"}>Signup</Link>
-            </span>
           </form>
         </div>
       </div>
