@@ -29,7 +29,7 @@ Deployment: Render (for separate deployment of frontend and backend)
 #Frontend
 Clone the Repository:
 
-git clone https://github.com/yourusername/nirmaan-mitra-frontend.git
+git clone https://rahulnaik8055/Nirmaan-Mitra.git
 
 cd nirmaan-mitra-frontend
 
