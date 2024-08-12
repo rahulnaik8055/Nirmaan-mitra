@@ -1,68 +1,121 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Assuming you're using React Router for navigation
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useFlashMessage } from "../../OtherComponents/FlashMessageContext";
+import config from "../../../config";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate(); // To redirect the user after login
+  const navigate = useNavigate();
+  const { showMessage } = useFlashMessage(); // Custom hook for flash messages
+  const [inputValue, setInputValue] = useState({
+    email: "",
+    password: "",
+  });
+  const { email, password } = inputValue;
+  const [validated, setValidated] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setInputValue({
+      ...inputValue,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
+    } else {
+      try {
+        const { data } = await axios.post(
+          `${config.API_URL}/login`, // Make sure the API URL is correct in your config
+          {
+            ...inputValue,
+          },
+          { withCredentials: true } // Include credentials if needed
+        );
+        const { success, message, token } = data; // Assuming your backend sends success, message, and token in the response
 
-    try {
-      const response = await fetch('http://localhost:3000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+        if (success) {
+          showMessage("Login successful!", "success"); // Show success message
+          console.log(data);
+          console.log(token);
 
-      const data = await response.json();
+          // Store the token in local storage
+          localStorage.setItem("token", token);
 
-      if (response.ok) {
-        // Assuming the token is returned in the response
-        const { token } = data;
-
-        // Store the token securely in localStorage or sessionStorage
-        localStorage.setItem('token', token);
-
-        // Redirect the user to a protected route or home page
-        navigate('/'); // Change '/dashboard' to your desired route
-      } else {
-        setError(data.message || 'Login failed');
+          // Redirect to the home page or any other route after a delay
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
+        } else {
+          showMessage(message, "error"); // Show error message if login fails
+        }
+      } catch (error) {
+        showMessage("An error occurred while logging in.", "error"); // Show error message on failure
+        console.error(error);
       }
-    } catch (error) {
-      setError('An error occurred. Please try again.');
     }
+    setValidated(true);
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    <div className="container mt-5 margin">
+      <div className="col-6 offset-3">
+        <div className="form_container">
+          <h2 className="text-warning display-4 fw-bold shadow-text fs-1 mb-1 text-center mb-3">
+            Login Account
+          </h2>
+          <form
+            noValidate
+            className={validated ? "was-validated" : ""}
+            onSubmit={handleSubmit}
+          >
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                type="email"
+                className="form-control"
+                name="email"
+                value={email}
+                placeholder="Enter your email"
+                onChange={handleOnChange}
+                id="email"
+                required
+              />
+              <div className="invalid-feedback">
+                Please provide a valid email.
+              </div>
+            </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <input
+                type="password"
+                className="form-control"
+                name="password"
+                value={password}
+                placeholder="Enter your password"
+                id="password"
+                onChange={handleOnChange}
+                required
+              />
+              <div className="invalid-feedback">Please provide a password.</div>
+            </div>
+            <button type="submit" className="btn btn-warning">
+              Login
+            </button>
+            <span className="ms-3">
+              Create new Account <Link to={"/signup"}>Signup</Link>
+            </span>
+          </form>
         </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
+      </div>
     </div>
   );
 };
