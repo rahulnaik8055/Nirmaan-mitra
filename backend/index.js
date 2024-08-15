@@ -27,6 +27,14 @@ const wrapAsync = require("./utils/wrapAsync");
 
 const authMiddleware = require("./Middlewares/AuthMiddleWare");
 
+app.use(
+  cors({
+    origin: ["https://nirmaan-mitra-frontend.onrender.com"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
@@ -46,14 +54,6 @@ const parser = multer({ storage: storage });
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cookieParser());
-
-app.use(
-  cors({
-    origin: ["https://nirmaan-mitra-frontend.onrender.com"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
