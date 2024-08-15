@@ -58,31 +58,44 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+main()
+  .then(() => {
+    console.log("connected successfully");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+async function main() {
+  await mongoose.connect(process.env.MONGO_URL);
+}
+
+const store = MongoStore.create({
+  mongoUrl: process.env.MONGO_URL,
+  crypto: {
+    secret: process.env.SECRET,
+  },
+  touchAfter: 24 * 3600,
+});
+
+store.on("error", () => {
+  console.log("error occured in MongoSession", err);
+});
+
 const sessionOptions = {
-  store: MongoStore.create({
-    mongoUrl:
-      "mongodb+srv://RahulNirmaanMitra:RahulNirmaanMitra@nirmaanmitracluster.abtieed.mongodb.net/NirmaanMitra?retryWrites=true&w=majority&appName=NirmaanMitraCluster",
-    collectionName: "sessions",
-    ttl: 14 * 24 * 60 * 60, // 14 days
-    autoRemove: "native", // Default
-    onError: (error) => {
-      console.error("Session Store Error:", error);
-    },
-  }),
+  store,
   secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    httpOnly: false,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax", // or "none" if using cross-site cookies
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
   },
 };
 
 app.use(session(sessionOptions));
 
-// Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -114,7 +127,6 @@ app.post("/login", (req, res, next) => {
         console.error("Login error:", err); // Log error details
         return next(err);
       }
-      console.log("User logged in successfully, session ID:", req.sessionID);
       res.json({ message: "Logged in successfully!", user, status: true });
     });
   })(req, res, next);
@@ -687,6 +699,6 @@ app.get(
 
 app.listen(PORT, () => {
   console.log(`app started at the port ${PORT}`);
-  mongoose.connect(url);
-  console.log("Connected to the database successfully");
+  // mongoose.connect(url);
+  // console.log("Connected to the database successfully");
 });
