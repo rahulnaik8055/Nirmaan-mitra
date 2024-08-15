@@ -68,7 +68,7 @@ const sessionOptions = {
   cookie: {
     expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
+    httpOnly: false,
   },
 };
 
@@ -93,11 +93,19 @@ app.post("/register", async (req, res) => {
 // Login route
 app.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
-    if (err) return next(err);
-    if (!user) return res.status(400).json({ message: info.message });
+    if (err) {
+      console.error("Authentication error:", err); // Log error details
+      return next(err);
+    }
+    if (!user) {
+      return res.status(400).json({ message: info.message });
+    }
 
     req.logIn(user, (err) => {
-      if (err) return next(err);
+      if (err) {
+        console.error("Login error:", err); // Log error details
+        return next(err);
+      }
       res.json({ message: "Logged in successfully!", user, status: true });
     });
   })(req, res, next);
