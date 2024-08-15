@@ -29,7 +29,7 @@ const authMiddleware = require("./Middlewares/AuthMiddleWare");
 
 app.use(
   cors({
-    origin: "https://nirmaan-mitra-frontend.onrender.com", // Replace with your exact frontend URL
+    origin: ["https://nirmaan-mitra-frontend.onrender.com"], // Replace with your exact frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -88,9 +88,11 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: true,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 1 week
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
     httpOnly: true,
+    secure: false, // Disable secure temporarily
+    sameSite: "None", // Set to None for cross-site cookies
   },
 };
 
