@@ -1,5 +1,5 @@
 const config = {
-  apiBaseUrl: "http://localhost:3000",
+  apiBaseUrl: "https://nirmaan-mitra.onrender.com",
 };
 
 export default config;
