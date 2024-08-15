@@ -56,7 +56,7 @@ app.use(
 );
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 const sessionOptions = {
   store: MongoStore.create({
@@ -64,11 +64,11 @@ const sessionOptions = {
     collectionName: "sessions", // Optional: You can specify the collection name
   }),
   secret: process.env.SECRET,
-  resave: false,
+  resave: true,
   saveUninitialized: false,
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    httpOnly: false, // Set to true for security
+    httpOnly: true, // Set to true for security
     secure: process.env.NODE_ENV === "production", // Set to true if using HTTPS
     sameSite: "lax", // or "none" if using cross-site cookies
   },
