@@ -24,12 +24,12 @@ function Navbar() {
           setRole(response.data.user.role);
         } else {
           setIsAuthenticated(false);
-          navigate("/login");
+          // navigate("/login");
         }
       } catch (error) {
         console.error("Error checking authentication:", error);
         setIsAuthenticated(false);
-        navigate("/login");
+        // navigate("/login");
       }
     };
 

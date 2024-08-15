@@ -27,6 +27,7 @@ const wrapAsync = require("./utils/wrapAsync");
 
 const authMiddleware = require("./Middlewares/AuthMiddleWare");
 
+// Cloudinary configuration
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
@@ -43,9 +44,49 @@ const storage = new CloudinaryStorage({
 
 const parser = multer({ storage: storage });
 
+// Connect to MongoDB
+main()
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
+async function main() {
+  await mongoose.connect(url);
+}
+
+// Configure MongoDB session store
+const store = MongoStore.create({
+  mongoUrl: url,
+  crypto: {
+    secret: process.env.SECRET,
+  },
+  touchAfter: 24 * 3600,
+});
+
+store.on("error", (error) => {
+  console.log("Error occurred in MongoSession", error);
+});
+
+// Session configuration
+const sessionOptions = {
+  store,
+  secret: process.env.SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "None",
+  },
+};
+
+// Apply middlewares
 app.use(bodyParser.json());
-app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(session(sessionOptions));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(
   cors({
@@ -54,50 +95,6 @@ app.use(
     credentials: true,
   })
 );
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-main()
-  .then(() => {
-    console.log("connected successfully");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
-async function main() {
-  await mongoose.connect(process.env.MONGO_URL);
-}
-
-const store = MongoStore.create({
-  mongoUrl: process.env.MONGO_URL,
-  crypto: {
-    secret: process.env.SECRET,
-  },
-  touchAfter: 24 * 3600,
-});
-
-store.on("error", () => {
-  console.log("error occured in MongoSession", err);
-});
-
-const sessionOptions = {
-  store,
-  secret: process.env.SECRET,
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: false,
-  },
-};
-
-app.use(session(sessionOptions));
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Routes
 app.post("/register", async (req, res) => {
@@ -111,28 +108,18 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// Login route
 app.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
-    if (err) {
-      console.error("Authentication error:", err); // Log error details
-      return next(err);
-    }
-    if (!user) {
-      return res.status(400).json({ message: info.message });
-    }
+    if (err) return next(err);
+    if (!user) return res.status(400).json({ message: info.message });
 
     req.logIn(user, (err) => {
-      if (err) {
-        console.error("Login error:", err); // Log error details
-        return next(err);
-      }
+      if (err) return next(err);
       res.json({ message: "Logged in successfully!", user, status: true });
     });
   })(req, res, next);
 });
 
-// Logout route
 app.post("/logout", (req, res) => {
   req.logout((err) => {
     if (err) return res.status(400).json({ error: err.message });
@@ -142,13 +129,11 @@ app.post("/logout", (req, res) => {
 
 app.get("/userStatus", (req, res) => {
   if (req.isAuthenticated()) {
-    // If authenticated, return user profile information
     return res.status(200).json({
       loggedIn: true,
       user: req.user,
     });
   } else {
-    // If not authenticated, return status only
     return res.status(200).json({
       loggedIn: false,
     });
