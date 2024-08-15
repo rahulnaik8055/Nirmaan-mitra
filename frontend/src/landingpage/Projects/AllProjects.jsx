@@ -3,7 +3,7 @@ import Project from "./Project";
 import axios from "axios";
 import LoadSpinner from "../../OtherComponents/Loader"; // Import the LoadSpinner component
 import config from "../../../config";
-import useUserProfile from "../../customHooks/userStatus";
+// import useUserProfile from "../../customHooks/userStatus";
 
 function AllProjects() {
   const [allProjects, setAllProjects] = useState([]);
@@ -12,10 +12,10 @@ function AllProjects() {
   const { isAuthenticated } = useUserProfile();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setLoading(false); // Stop loading if not authenticated
-      return;
-    }
+    // if (!isAuthenticated) {
+    //   setLoading(false); // Stop loading if not authenticated
+    //   return;
+    // }
 
     const fetchProjects = async () => {
       try {
