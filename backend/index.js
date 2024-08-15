@@ -52,7 +52,7 @@ app.use(
   cors({
     origin: ["https://nirmaan-mitra-frontend.onrender.com"],
     methods: ["GET", "POST", "PUT", "DELETE"],
-    // credentials: true,
+    credentials: true,
   })
 );
 
