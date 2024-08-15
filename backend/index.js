@@ -114,6 +114,7 @@ app.post("/login", (req, res, next) => {
         console.error("Login error:", err); // Log error details
         return next(err);
       }
+      console.log("User logged in successfully, session ID:", req.sessionID);
       res.json({ message: "Logged in successfully!", user, status: true });
     });
   })(req, res, next);
