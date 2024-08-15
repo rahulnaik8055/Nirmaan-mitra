@@ -17,7 +17,7 @@ function Navbar() {
         const response = await axios.get(`${config.apiBaseUrl}/userStatus`, {
           withCredentials: true,
         });
-
+        console.log(response.data);
         if (response.data.loggedIn) {
           setIsAuthenticated(true);
           setUserId(response.data.user._id);
