@@ -60,15 +60,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Express session
-app.use(
-  session({
-    secret: "your_secret_key",
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: "mongodb://localhost/session_store" }),
-    cookie: { secure: process.env.NODE_ENV === "production" }, // Ensure this matches your environment
-  })
-);
+const sessionOptions = {
+  // store,
+  secret: process.env.SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  },
+};
+
+app.use(session(sessionOptions));
 
 // Passport middleware
 app.use(passport.initialize());
