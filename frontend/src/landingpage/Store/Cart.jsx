@@ -3,11 +3,11 @@ import axios from "axios";
 import { CartContext } from "./CartContext";
 import { v4 as uuidv4 } from "uuid";
 import CartComponent from "./CartComponent";
-import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import Orders from "./Orders";
 import config from "../../../config";
 import { useFlashMessage } from "../../OtherComponents/FlashMessageContext";
+import useIsAuthenticated from "../../customHooks/isAuthenticated";
 
 const Cart = () => {
   const { cartItems, totalAmount, setCartItems, setTotalAmount } =
@@ -15,8 +15,7 @@ const Cart = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState("");
-  const [cookies, removeCookie] = useCookies(["token"]);
+  const { isAuthenticated } = useIsAuthenticated(); // Get authentication status from the custom hook
   const navigate = useNavigate();
   const { showMessage } = useFlashMessage();
 
@@ -32,41 +31,16 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    const verifyCookie = async () => {
-      if (!cookies.token) {
-        navigate("/login");
-        return;
-      }
-
-      try {
-        const { data } = await axios.post(
-          `${config.apiBaseUrl}`,
-          {},
-          { withCredentials: true }
-        );
-
-        const { status, userId } = data;
-        setUserId(userId);
-
-        if (!status) {
-          removeCookie("token");
-          navigate("/login");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    verifyCookie();
-  }, [cookies.token, navigate, removeCookie]);
+    // Redirect to login if user is not authenticated
+    if (!isAuthenticated) {
+      return;
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleOrder = () => {
     setLoading(true);
 
     const orderData = {
-      userId: userId,
       items: cartItems.map((item) => ({
         key: uuidv4(),
         productId: item._id,
@@ -76,7 +50,7 @@ const Cart = () => {
     };
 
     axios
-      .post(`${config.apiBaseUrl}/orders`, orderData)
+      .post(`${config.apiBaseUrl}/orders`, orderData, { withCredentials: true })
       .then((response) => {
         setLoading(false);
         setSuccessMessage("Order placed successfully!...Delivery soon");

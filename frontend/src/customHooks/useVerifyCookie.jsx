@@ -1,46 +1,46 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useCookies } from "react-cookie";
 import config from "../../config";
+import useIsAuthenticated from "../customHooks/isAuthenticated";
 
-const useVerifyCookie = () => {
+const useUserProfile = () => {
   const [userId, setUserId] = useState(null);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [cookies, removeCookie] = useCookies([]);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading } = useIsAuthenticated();
 
   useEffect(() => {
-    const verifyCookie = async () => {
-      if (!cookies.token) {
+    const fetchUserProfile = async () => {
+      if (authLoading) return; // Wait until authentication check is done
+
+      if (!isAuthenticated) {
         navigate("/login");
+        setLoading(false);
+        return;
       }
 
       try {
-        const { data } = await axios.post(
-          `${config.apiBaseUrl}`,
-          {},
-          {
-            withCredentials: true,
-          }
-        );
+        const { data } = await axios.get(`${config.apiBaseUrl}/profile`, {
+          withCredentials: true,
+        });
 
-        const { status, userId, role } = data;
-        setUserId(userId);
+        const { _id, role } = data.user;
+        setUserId(_id);
         setRole(role);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+        setLoading(false);
+      } catch (err) {
         navigate("/login");
-      } finally {
         setLoading(false);
       }
     };
 
-    verifyCookie();
-  }, [cookies.token, navigate, removeCookie]);
+    fetchUserProfile();
+  }, [authLoading, isAuthenticated, navigate]);
 
-  return { userId, role, loading };
+  return { userId, role, loading, error };
 };
 
-export default useVerifyCookie;
+export default useUserProfile;

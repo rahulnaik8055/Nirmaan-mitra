@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.4.1",
     "axios": "^1.7.2",
     "mapbox-gl": "^3.5.1",
     "nprogress": "^0.2.0",

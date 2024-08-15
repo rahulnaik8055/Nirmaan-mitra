@@ -7,7 +7,6 @@ const url = process.env.MONGO_URL;
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-
 const { ProductsModel } = require("./models/ProductsModel");
 const { Project } = require("./models/ProjectModel");
 const { OrderModel } = require("./models/OrderModel");
@@ -15,15 +14,19 @@ const { Engineer } = require("./models/EngineerModel");
 const Employer = require("./models/EmployerModel");
 const User = require("./models/User");
 const Work = require("./models/Work");
-
 const axios = require("axios");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
-
-const authRoute = require("./Routes/AuthRoute");
-const authMiddleware = require("./Middlewares/verifyToken");
+const session = require("express-session");
+const passport = require("./passportConfig"); // Import the configured passport
+const MongoStore = require("connect-mongo");
 const wrapAsync = require("./utils/wrapAsync");
+const verifyToken = require("./Middlewares/AuthMiddleWare");
+
+// Routes
+
+const authMiddleware = require("./Middlewares/AuthMiddleWare");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -47,11 +50,78 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ["https://nirmaan-mitra-frontend.onrender.com"],
+    origin: ["http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// Express session
+app.use(
+  session({
+    secret: "yourSecretKey",
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: url }), // Use your MongoDB URI
+  })
+);
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Routes
+app.post("/register", async (req, res) => {
+  try {
+    const { role, email, password } = req.body;
+    const user = new User({ role, email, password });
+    await user.save();
+    res.status(201).json({ message: "User registered successfully!" });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Login route
+app.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) return next(err);
+    if (!user) return res.status(400).json({ message: info.message });
+
+    req.logIn(user, (err) => {
+      if (err) return next(err);
+      res.json({ message: "Logged in successfully!", user, status: true });
+    });
+  })(req, res, next);
+});
+
+// Logout route
+app.post("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    res.json({ message: "Logged out successfully!" });
+  });
+});
+
+app.get("/profile", verifyToken, (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized access" });
+  }
+
+  // Assuming req.user contains user information
+  res.status(200).json({ user: req.user });
+});
+
+app.get("/isAuthenticated", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json({ loggedIn: true });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
 
 // Function to perform geocoding using Mapbox API
 const geocode = async (location) => {
@@ -125,6 +195,7 @@ app.get(
 app.post(
   "/projects",
   parser.single("image"),
+  authMiddleware,
   wrapAsync(async (req, res) => {
     // Check if an image was uploaded, if not, set a default image path
     const imagePath = req.file ? req.file.path : "path/to/default/image.jpg";
@@ -135,7 +206,7 @@ app.post(
       description: req.body.description,
       image: imagePath, // Use the uploaded image path or the default one
       location: req.body.location,
-      owner: req.body.owner,
+      owner: req.user._id,
     });
 
     res.status(201).json(newProject);
@@ -191,9 +262,11 @@ app.get("/products", async (req, res) => {
 // Route to place a new order
 app.post(
   "/orders",
+  authMiddleware,
   wrapAsync(async (req, res) => {
-    const { userId, items, total } = req.body;
-
+    const { items, total } = req.body;
+    console.log(req.user);
+    const userId = req.user._id;
     // Create a new order
     const newOrder = new OrderModel({
       items,
@@ -213,8 +286,9 @@ app.get(
   "/orders",
   authMiddleware,
   wrapAsync(async (req, res) => {
+    console.log(req.user);
     // Fetch orders related to the userId
-    const orders = await OrderModel.find({ userId: req.user }).populate(
+    const orders = await OrderModel.find({ userId: req.user._id }).populate(
       "items.productId"
     );
 
@@ -279,7 +353,6 @@ app.post(
   wrapAsync(async (req, res) => {
     // Check if the user is authenticated and has the "Engineer" role
     const userId = req.user;
-
     const user = await User.find({ _id: userId });
 
     if (!user) {
@@ -590,10 +663,10 @@ app.get(
   })
 );
 
-app.use("/", authRoute);
+// app.use("/", authRoute);
 
 app.listen(PORT, () => {
-  console.log(`app started at the port`);
+  console.log(`app started at the port ${PORT}`);
   mongoose.connect(url);
   console.log("Connected to the database successfully");
 });

@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useCookies } from "react-cookie";
 import { Link } from "react-router-dom";
 import UserProjects from "../Projects/UserProjects";
 import config from "../../../config";
+import useIsAuthenticated from "../../customHooks/isAuthenticated";
 
 const ProfileEmployer = () => {
   const [profile, setProfile] = useState(null);
-  const [cookies] = useCookies([]);
-
+  const { isAuthenticated } = useIsAuthenticated();
   // Fetch profile once the user is verified
   useEffect(() => {
-    if (!cookies.token) return; // Skip fetching profile if no token
+    if (!isAuthenticated) return; // Skip fetching profile if no token
 
     const fetchProfile = async () => {
       try {
@@ -28,7 +27,7 @@ const ProfileEmployer = () => {
     };
 
     fetchProfile();
-  }, [cookies.token]);
+  }, [isAuthenticated]);
 
   if (!profile) {
     return <p className="text-center mt-5">Loading...</p>;

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useCookies } from "react-cookie";
 import { useFlashMessage } from "../../OtherComponents/FlashMessageContext";
 import LoadingSpinner from "../../OtherComponents/Loader";
 import config from "../../../config";
+import useIsAuthenticated from "../../customHooks/isAuthenticated";
 
 function NewProject() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useIsAuthenticated();
   const [formData, setFormData] = useState({
     ProjectName: "",
     description: "",
@@ -22,40 +23,13 @@ function NewProject() {
     image: false,
   });
 
-  const [userId, setUserId] = useState("");
-  const [cookies, removeCookie] = useCookies(["token"]);
   const { showMessage } = useFlashMessage();
 
   useEffect(() => {
-    const verifyCookie = async () => {
-      if (!cookies.token) {
-        navigate("/login");
-        return;
-      }
-
-      try {
-        const { data } = await axios.post(
-          `${config.apiBaseUrl}`,
-          {},
-          { withCredentials: true }
-        );
-
-        const { status, userId, role } = data;
-        setUserId(userId);
-
-        if (!status) {
-          removeCookie("token");
-          navigate("/login");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false); // Update loading state after fetching data
-      }
-    };
-
-    verifyCookie();
-  }, [cookies.token, navigate, removeCookie]);
+    if (!isAuthenticated) {
+      return;
+    }
+  }, [isAuthenticated]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -90,7 +64,7 @@ function NewProject() {
     formDataToSend.append("ProjectName", formData.ProjectName);
     formDataToSend.append("description", formData.description);
     formDataToSend.append("location", formData.location);
-    formDataToSend.append("owner", userId);
+    // formDataToSend.append("owner", userId);
 
     if (formData.image) {
       formDataToSend.append("image", formData.image);
@@ -104,6 +78,7 @@ function NewProject() {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        withCredentials: true,
       });
       showMessage("Project created successfully", "success");
       navigate("/profile");

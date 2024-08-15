@@ -27,12 +27,13 @@ const Login = () => {
           inputValue,
           { withCredentials: true }
         );
-        const { success, message, token } = data;
-        if (success) {
+
+        if (data.status) {
           showMessage("Login successful!", "success"); // Show success message
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
+          // setTimeout(() => {
+          //   navigate("/");
+          // }, 1000);
+          navigate("/");
         } else {
           showMessage(message, "error");
         }

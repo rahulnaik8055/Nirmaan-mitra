@@ -33,7 +33,7 @@ const Signup = () => {
     } else {
       try {
         const { data } = await axios.post(
-          `${config.apiBaseUrl}/signup`,
+          `${config.apiBaseUrl}/register`,
           {
             ...inputValue,
           },

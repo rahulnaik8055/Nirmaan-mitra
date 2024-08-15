@@ -1,17 +1,49 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useCookies } from "react-cookie";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import useVerifyCookie from "./customHooks/useVerifyCookie";
 import { useFlashMessage } from "./OtherComponents/FlashMessageContext";
 import config from "../config";
 
 function Navbar() {
-  const [cookies,removeCookie] = useCookies([]);
-  const { role } = useVerifyCookie();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [role, setRole] = useState(null);
   const { showMessage } = useFlashMessage();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        const response = await axios.get(
+          `${config.apiBaseUrl}/isAuthenticated`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (response.data.loggedIn) {
+          setIsAuthenticated(true);
+
+          // Fetch user profile only if authenticated
+          const { data } = await axios.get(`${config.apiBaseUrl}/profile`, {
+            withCredentials: true,
+          });
+          setUserId(data.user._id);
+          setRole(data.user.role);
+        } else {
+          setIsAuthenticated(false);
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setIsAuthenticated(false);
+        navigate("/login");
+      }
+    };
+
+    checkAuthentication();
+
+    // Handle navbar collapse on link click
     const navbarCollapse = document.querySelector(".navbar-collapse");
     const navLinks = document.querySelectorAll(".nav-link");
 
@@ -20,18 +52,19 @@ function Navbar() {
         navbarCollapse.classList.remove("show");
       });
     });
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
     axios
-      .get(`${config.apiBaseUrl}/logout`, { withCredentials: true })
-      .then((res) => {
-        removeCookie("token");
+      .post(`${config.apiBaseUrl}/logout`, {}, { withCredentials: true })
+      .then(() => {
+        setIsAuthenticated(false);
         showMessage("Logged out successfully", "success");
+        navigate("/login");
       })
       .catch((err) => {
-        console.log(err);
-        showMessage(err.message, "error");
+        console.error("Logout error:", err);
+        showMessage("Error logging out. Please try again.", "error");
       });
   };
 
@@ -57,7 +90,7 @@ function Navbar() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link className="nav-link" exact="true" to="/">
+              <Link className="nav-link" to="/">
                 Home
               </Link>
             </li>
@@ -66,11 +99,16 @@ function Navbar() {
                 About
               </Link>
             </li>
-            {cookies.token && (
+            {isAuthenticated && (
               <>
                 <li className="nav-item">
                   <Link className="nav-link" to="/project">
                     Explore
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/profile">
+                    Profile
                   </Link>
                 </li>
                 {role === "Employer" && (
@@ -80,16 +118,11 @@ function Navbar() {
                     </Link>
                   </li>
                 )}
-                <li className="nav-item">
-                  <Link className="nav-link" to="/profile">
-                    Profile
-                  </Link>
-                </li>
               </>
             )}
           </ul>
           <ul className="navbar-nav ms-auto">
-            {cookies.token ? (
+            {isAuthenticated && userId ? (
               <>
                 <li className="nav-item">
                   <Link className="nav-link" to="/store">

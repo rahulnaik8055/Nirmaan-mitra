@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useCookies } from "react-cookie";
 import { Link } from "react-router-dom";
 import Project from "../Projects/Project";
 import config from "../../../config";
+import useIsAuthenticated from "../../customHooks/isAuthenticated"; // Ensure the path is correct
 
 const ProfileEngineer = () => {
   const [profile, setProfile] = useState(null);
   const [projects, setProjects] = useState([]);
-  const [cookies] = useCookies([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { isAuthenticated } = useIsAuthenticated(); // Ensure parentheses are included
 
   useEffect(() => {
-    if (!cookies.token) return;
+    if (!isAuthenticated) return;
 
     const fetchProfile = async () => {
       try {
@@ -22,9 +24,14 @@ const ProfileEngineer = () => {
           }
         );
         setProfile(response.data);
-        fetchProjects(response.data.engineerProfile._id); // Fetch projects using engineer's ID
+        if (response.data.engineerProfile?._id) {
+          fetchProjects(response.data.engineerProfile._id); // Fetch projects using engineer's ID
+        }
       } catch (error) {
         console.error("Error fetching profile:", error);
+        setError("Error fetching profile data. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -39,14 +46,23 @@ const ProfileEngineer = () => {
         setProjects(response.data);
       } catch (error) {
         console.error("Error fetching projects:", error);
+        setError("Error fetching projects. Please try again later.");
       }
     };
 
     fetchProfile();
-  }, [cookies.token]);
+  }, [isAuthenticated]);
+
+  if (loading) {
+    return <p className="text-center mt-5">Loading...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center mt-5 text-danger">{error}</p>;
+  }
 
   if (!profile) {
-    return <p className="text-center mt-5">Loading...</p>;
+    return <p className="text-center mt-5">Profile not found.</p>;
   }
 
   const { username, email, engineerProfile } = profile;
@@ -62,12 +78,16 @@ const ProfileEngineer = () => {
       </div>
       <div className="row">
         <div className="col-12 col-lg-6 text-center mb-4">
-          <img
-            src={image}
-            alt="user-profile"
-            className="img-fluid rounded border mb-3 p-3"
-            style={{ maxHeight: "340px" }}
-          />
+          {image ? (
+            <img
+              src={image}
+              alt="user-profile"
+              className="img-fluid rounded border mb-3 p-3"
+              style={{ maxHeight: "340px" }}
+            />
+          ) : (
+            <p>No image available</p>
+          )}
         </div>
         <div className="col-12 col-lg-6">
           <div className="card shadow-sm border-0 rounded">
@@ -102,7 +122,7 @@ const ProfileEngineer = () => {
             </div>
           </div>
         </div>
-        <div className=" mt-3">
+        <div className="mt-3">
           <h2 className="text-warning display-4 fw-bold shadow-text fs-1 text-center">
             Projects Working on
           </h2>

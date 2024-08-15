@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useCookies } from "react-cookie";
 import { v4 as uuidv4 } from "uuid";
 import config from "../../../config";
+import useIsAuthenticated from "../../customHooks/isAuthenticated";
+
 function Orders() {
   const [orders, setOrders] = useState([]);
+  const { isAuthenticated } = useIsAuthenticated(); // Use hook for authentication status
 
-  const [cookies] = useCookies(["token"]);
-
-  // Fetch orders once the user is verified
+  // Fetch orders once the user is authenticated
   useEffect(() => {
-    if (!cookies.token) return; // Skip fetching orders if no token
+    if (!isAuthenticated) return; // Skip fetching orders if not authenticated
 
     const fetchOrders = async () => {
       try {
@@ -24,7 +24,7 @@ function Orders() {
     };
 
     fetchOrders();
-  }, [cookies.token]);
+  }, [isAuthenticated]);
 
   return (
     <div className="container text-center mt-5">
@@ -34,10 +34,10 @@ function Orders() {
       <div className="row shopcards text-center">
         {orders.length > 0 ? (
           orders.map((order) => (
-            <div key={order._id} className=" mb-4">
+            <div key={order._id} className="mb-4">
               <div className="card border-5">
                 <div className="card-body">
-                  <h6 className="text-warning display-4 fw-bold shadow-text fs-3 mb-5 ">
+                  <h6 className="text-warning display-4 fw-bold shadow-text fs-3 mb-5">
                     Items:
                   </h6>
                   <ul className="list-group list-group-flush">
@@ -61,7 +61,7 @@ function Orders() {
                       </li>
                     ))}
                   </ul>
-                  <h6 className=" mt-3 border p-3 ">
+                  <h6 className="mt-3 border p-3">
                     <b>Total:</b> &#8377;{order.total}
                   </h6>
                   <br />
