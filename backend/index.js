@@ -83,15 +83,14 @@ store.on("error", () => {
 });
 
 const sessionOptions = {
-  store, // Ensure this is properly set up for your session store
-  secret: process.env.SECRET, // Ensure this is set securely in your environment
+  store,
+  secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: true, // Set to false to avoid saving uninitialized sessions
+  saveUninitialized: true,
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    httpOnly: true, // Helps mitigate the risk of client-side script accessing the cookie
-    secure: process.env.NODE_ENV === "production", // True in production to ensure cookies are sent over HTTPS
-    sameSite: "None", // Required for cross-domain cookies
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: false,
   },
 };
 
