@@ -127,7 +127,13 @@ app.post("/login", (req, res, next) => {
         console.error("Login error:", err); // Log error details
         return next(err);
       }
-      res.json({ message: "Logged in successfully!", user, status: true });
+      const success = req.isAuthenticated();
+      res.json({
+        message: "Logged in successfully!",
+        user,
+        status: true,
+        success,
+      });
     });
   })(req, res, next);
 });
