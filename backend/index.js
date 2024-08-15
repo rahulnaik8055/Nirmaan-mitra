@@ -60,16 +60,22 @@ app.use(express.urlencoded({ extended: true }));
 
 const sessionOptions = {
   store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URL, // Your MongoDB connection URL
-    collectionName: "sessions", // Optional: You can specify the collection name
+    mongoUrl:
+      "mongodb+srv://RahulNirmaanMitra:RahulNirmaanMitra@nirmaanmitracluster.abtieed.mongodb.net/NirmaanMitra?retryWrites=true&w=majority&appName=NirmaanMitraCluster",
+    collectionName: "sessions",
+    ttl: 14 * 24 * 60 * 60, // 14 days
+    autoRemove: "native", // Default
+    onError: (error) => {
+      console.error("Session Store Error:", error);
+    },
   }),
   secret: process.env.SECRET,
-  resave: true,
+  resave: false,
   saveUninitialized: false,
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    httpOnly: true, // Set to true for security
-    secure: process.env.NODE_ENV === "production", // Set to true if using HTTPS
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax", // or "none" if using cross-site cookies
   },
 };
