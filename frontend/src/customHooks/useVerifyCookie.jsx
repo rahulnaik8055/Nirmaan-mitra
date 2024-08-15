@@ -17,7 +17,7 @@ const useUserProfile = () => {
       if (authLoading) return; // Wait until authentication check is done
 
       if (!isAuthenticated) {
-        navigate("/login");
+        // navigate("/login");
         setLoading(false);
         return;
       }
@@ -29,13 +29,13 @@ const useUserProfile = () => {
             withCredentials: true,
           }
         );
-
+        console.log(data);
         const { _id, role } = data.user;
         setUserId(_id);
         setRole(role);
         setLoading(false);
       } catch (err) {
-        navigate("/login");
+        // navigate("/login");
         setLoading(false);
       }
     };

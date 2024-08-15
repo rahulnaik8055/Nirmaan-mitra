@@ -27,7 +27,7 @@ const Login = () => {
           inputValue,
           { withCredentials: true }
         );
-
+        console.log(data);
         if (data.status) {
           showMessage("Login successful!", "success"); // Show success message
           // setTimeout(() => {
