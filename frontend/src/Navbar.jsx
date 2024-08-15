@@ -3,14 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useFlashMessage } from "./OtherComponents/FlashMessageContext";
 import config from "../config";
+import { useCookies } from "react-cookie";
 
 function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userId, setUserId] = useState(null);
   const [role, setRole] = useState(null);
   const { showMessage } = useFlashMessage();
+  const [cookie] = useCookies["connect.sid"];
   const navigate = useNavigate();
-
+  console.log(cookie);
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
