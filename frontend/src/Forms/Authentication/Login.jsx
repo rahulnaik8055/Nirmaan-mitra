@@ -25,7 +25,7 @@ const Login = () => {
         const { data } = await axios.post(
           `${config.apiBaseUrl}/login`,
           inputValue,
-          { withCredentials: true }
+          // { withCredentials: true }
         );
 
         if (data.status) {
