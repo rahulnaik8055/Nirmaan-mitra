@@ -88,11 +88,11 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: true,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 1 week
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    httpOnly: true,
-    secure: false, // Disable secure temporarily
-    sameSite: "None", // Set to None for cross-site cookies
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: false,
+    secure: false, // Temporarily disable secure for testing
+    sameSite: "None", // Cross-site cookies require this setting
   },
 };
 
