@@ -29,7 +29,7 @@ const authMiddleware = require("./Middlewares/AuthMiddleWare");
 
 app.use(
   cors({
-    origin: ["https://nirmaan-mitra-frontend.onrender.com"],
+    origin: "https://nirmaan-mitra-frontend.onrender.com", // Replace with your exact frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -86,13 +86,12 @@ const sessionOptions = {
   store,
   secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: false,
-    sameSite: "none",
-    secure: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+    httpOnly: true, // Ensures the cookie is only accessible via HTTP(S)
+    secure: true, // Ensures the cookie is only sent over HTTPS
+    sameSite: "None", // Required for cross-site cookies
   },
 };
 
@@ -130,25 +129,22 @@ app.post("/login", (req, res, next) => {
         return next(err);
       }
 
-      // Log session after login
-      console.log("Login Session ID:", req.sessionID);
-      console.log("Login Session Object:", req.session);
+      console.log("Login - Session ID:", req.sessionID);
+      console.log("Login - Session Object:", req.session);
 
       res.json({
         message: "Logged in successfully!",
         user,
         status: true,
-        success: req.isAuthenticated(),
       });
     });
   })(req, res, next);
 });
 
 app.get("/userStatus", (req, res) => {
-  // Log session during userStatus check
-  console.log("UserStatus Session ID:", req.sessionID);
-  console.log("UserStatus Is Authenticated:", req.isAuthenticated());
-  console.log("UserStatus Session Object:", req.session);
+  console.log("UserStatus - Session ID:", req.sessionID);
+  console.log("UserStatus - Is Authenticated:", req.isAuthenticated());
+  console.log("UserStatus - Session Object:", req.session);
 
   if (req.isAuthenticated()) {
     return res.status(200).json({
