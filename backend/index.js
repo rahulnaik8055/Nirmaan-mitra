@@ -22,7 +22,6 @@ const session = require("express-session");
 const passport = require("./passportConfig"); // Import the configured passport
 const MongoStore = require("connect-mongo");
 const wrapAsync = require("./utils/wrapAsync");
-const verifyToken = require("./Middlewares/AuthMiddleWare");
 
 // Routes
 
@@ -69,7 +68,7 @@ const sessionOptions = {
   saveUninitialized: false,
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    httpOnly: true, // Set to true for security
+    httpOnly: false, // Set to true for security
     secure: process.env.NODE_ENV === "production", // Set to true if using HTTPS
     sameSite: "lax", // or "none" if using cross-site cookies
   },
