@@ -59,16 +59,19 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Express session
 const sessionOptions = {
-  // store,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URL, // Your MongoDB connection URL
+    collectionName: "sessions", // Optional: You can specify the collection name
+  }),
   secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: false,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+    httpOnly: true, // Set to true for security
+    secure: process.env.NODE_ENV === "production", // Set to true if using HTTPS
+    sameSite: "lax", // or "none" if using cross-site cookies
   },
 };
 
