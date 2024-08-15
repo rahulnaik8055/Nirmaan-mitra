@@ -117,7 +117,7 @@ app.post("/register", async (req, res) => {
 app.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
-      console.error("Authentication error:", err); // Log error details
+      console.error("Authentication error:", err);
       return next(err);
     }
     if (!user) {
@@ -126,32 +126,29 @@ app.post("/login", (req, res, next) => {
 
     req.logIn(user, (err) => {
       if (err) {
-        console.error("Login error:", err); // Log error details
+        console.error("Login error:", err);
         return next(err);
       }
-      const success = req.isAuthenticated();
+
+      // Log session after login
+      console.log("Login Session ID:", req.sessionID);
+      console.log("Login Session Object:", req.session);
+
       res.json({
         message: "Logged in successfully!",
         user,
         status: true,
-        success,
+        success: req.isAuthenticated(),
       });
     });
   })(req, res, next);
 });
 
-// Logout route
-app.post("/logout", (req, res) => {
-  req.logout((err) => {
-    if (err) return res.status(400).json({ error: err.message });
-    res.json({ message: "Logged out successfully!" });
-  });
-});
-
 app.get("/userStatus", (req, res) => {
-  console.log("Session ID:", req.sessionID);
-  console.log("Is Authenticated:", req.isAuthenticated());
-  console.log("Session Object:", req.session);
+  // Log session during userStatus check
+  console.log("UserStatus Session ID:", req.sessionID);
+  console.log("UserStatus Is Authenticated:", req.isAuthenticated());
+  console.log("UserStatus Session Object:", req.session);
 
   if (req.isAuthenticated()) {
     return res.status(200).json({
@@ -163,6 +160,14 @@ app.get("/userStatus", (req, res) => {
       loggedIn: false,
     });
   }
+});
+
+// Logout route
+app.post("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    res.json({ message: "Logged out successfully!" });
+  });
 });
 
 // Function to perform geocoding using Mapbox API
