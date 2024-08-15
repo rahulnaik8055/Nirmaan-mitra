@@ -90,7 +90,9 @@ const sessionOptions = {
   cookie: {
     expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
+    httpOnly: false,
+    sameSite: "none",
+    secure: "true",
   },
 };
 
@@ -147,14 +149,16 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/userStatus", (req, res) => {
+  console.log("Session ID:", req.sessionID);
+  console.log("Is Authenticated:", req.isAuthenticated());
+  console.log("Session Object:", req.session);
+
   if (req.isAuthenticated()) {
-    // If authenticated, return user profile information
     return res.status(200).json({
       loggedIn: true,
       user: req.user,
     });
   } else {
-    // If not authenticated, return status only
     return res.status(200).json({
       loggedIn: false,
     });
