@@ -20,7 +20,7 @@ const useUserProfile = () => {
         });
 
         const { loggedIn, user } = response.data;
-
+        console.log(response.data);
         setIsAuthenticated(loggedIn);
 
         if (loggedIn) {
@@ -28,10 +28,10 @@ const useUserProfile = () => {
           setUserId(_id);
           setRole(role);
         } else {
-          navigate("/login");
+          //   navigate("/login");
         }
       } catch (error) {
-        navigate("/login");
+        // navigate("/login");
         setError(error);
       } finally {
         setLoading(false);
