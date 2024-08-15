@@ -86,12 +86,11 @@ const sessionOptions = {
   store,
   secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    httpOnly: true, // Ensures the cookie is only accessible via HTTP(S)
-    secure: true, // Ensures the cookie is only sent over HTTPS
-    sameSite: "None", // Required for cross-site cookies
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
   },
 };
 
