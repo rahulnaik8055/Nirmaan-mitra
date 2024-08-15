@@ -128,13 +128,13 @@ app.get("/profile", verifyToken, (req, res) => {
   res.status(200).json({ user: req.user });
 });
 
-app.get("/isAuthenticated", (req, res) => {
-  if (req.isAuthenticated()) {
-    res.json({ loggedIn: true });
-  } else {
-    res.json({ loggedIn: false });
-  }
-});
+// app.get("/isAuthenticated", (req, res) => {
+//   if (req.isAuthenticated()) {
+//     res.json({ loggedIn: true });
+//   } else {
+//     res.json({ loggedIn: false });
+//   }
+// });
 
 // Function to perform geocoding using Mapbox API
 const geocode = async (location) => {
