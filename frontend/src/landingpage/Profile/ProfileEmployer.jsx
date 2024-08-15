@@ -3,11 +3,11 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import UserProjects from "../Projects/UserProjects";
 import config from "../../../config";
-import useIsAuthenticated from "../../customHooks/isAuthenticated";
+import useUserProfile from "../../customHooks/userStatus";
 
 const ProfileEmployer = () => {
   const [profile, setProfile] = useState(null);
-  const { isAuthenticated } = useIsAuthenticated();
+  const { isAuthenticated } = useUserProfile();
   // Fetch profile once the user is verified
   useEffect(() => {
     if (!isAuthenticated) return; // Skip fetching profile if no token

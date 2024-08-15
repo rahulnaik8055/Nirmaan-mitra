@@ -14,22 +14,14 @@ function Navbar() {
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
-        const response = await axios.get(
-          `${config.apiBaseUrl}/isAuthenticated`,
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get(`${config.apiBaseUrl}/userStatus`, {
+          withCredentials: true,
+        });
 
         if (response.data.loggedIn) {
           setIsAuthenticated(true);
-
-          // Fetch user profile only if authenticated
-          const { data } = await axios.get(`${config.apiBaseUrl}/profile`, {
-            withCredentials: true,
-          });
-          setUserId(data.user._id);
-          setRole(data.user.role);
+          setUserId(response.data.user._id);
+          setRole(response.data.user.role);
         } else {
           setIsAuthenticated(false);
           navigate("/login");
@@ -44,28 +36,42 @@ function Navbar() {
     checkAuthentication();
 
     // Handle navbar collapse on link click
-    const navbarCollapse = document.querySelector(".navbar-collapse");
-    const navLinks = document.querySelectorAll(".nav-link");
-
-    navLinks.forEach((link) => {
-      link.addEventListener("click", () => {
+    const handleNavLinkClick = () => {
+      const navbarCollapse = document.querySelector(".navbar-collapse");
+      if (navbarCollapse) {
         navbarCollapse.classList.remove("show");
-      });
+      }
+    };
+
+    const navLinks = document.querySelectorAll(".nav-link");
+    navLinks.forEach((link) => {
+      link.addEventListener("click", handleNavLinkClick);
     });
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      navLinks.forEach((link) => {
+        link.removeEventListener("click", handleNavLinkClick);
+      });
+    };
   }, [navigate]);
 
-  const handleLogout = () => {
-    axios
-      .post(`${config.apiBaseUrl}/logout`, {}, { withCredentials: true })
-      .then(() => {
-        setIsAuthenticated(false);
-        showMessage("Logged out successfully", "success");
-        navigate("/login");
-      })
-      .catch((err) => {
-        console.error("Logout error:", err);
-        showMessage("Error logging out. Please try again.", "error");
-      });
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${config.apiBaseUrl}/logout`,
+        {},
+        { withCredentials: true }
+      );
+      setIsAuthenticated(false);
+      setUserId(null);
+      setRole(null);
+      showMessage("Logged out successfully", "success");
+      navigate("/login");
+    } catch (err) {
+      console.error("Logout error:", err);
+      showMessage("Error logging out. Please try again.", "error");
+    }
   };
 
   return (

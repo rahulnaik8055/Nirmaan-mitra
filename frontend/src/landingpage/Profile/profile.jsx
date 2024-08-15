@@ -7,15 +7,16 @@ import ProfileEngineer from "./ProfileEngineer";
 import ProfileEmployer from "./ProfileEmployer";
 import config from "../../../config";
 import axios from "axios";
-import useUserProfile from "../../customHooks/useVerifyCookie"; // Update the path as necessary
+import useUserProfile from "../../customHooks/userStatus";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { userId, role, loading, error } = useUserProfile();
   const [profileMessage, setProfileMessage] = useState("");
+  const { isAuthenticated } = useUserProfile();
 
   useEffect(() => {
-    if (!userId) return; // Avoid making requests if userId is not available
+    if (!isAuthenticated) return; // Avoid making requests if userId is not available
 
     const checkProfileExistence = async () => {
       try {

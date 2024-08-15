@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Orders from "./Orders";
 import config from "../../../config";
 import { useFlashMessage } from "../../OtherComponents/FlashMessageContext";
-import useIsAuthenticated from "../../customHooks/isAuthenticated";
+import useUserProfile from "../../customHooks/userStatus";
 
 const Cart = () => {
   const { cartItems, totalAmount, setCartItems, setTotalAmount } =
@@ -15,7 +15,7 @@ const Cart = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { isAuthenticated } = useIsAuthenticated(); // Get authentication status from the custom hook
+  const { isAuthenticated } = useUserProfile(); // Get authentication status from the custom hook
   const navigate = useNavigate();
   const { showMessage } = useFlashMessage();
 

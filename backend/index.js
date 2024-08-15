@@ -119,22 +119,20 @@ app.post("/logout", (req, res) => {
   });
 });
 
-app.get("/profile", verifyToken, (req, res) => {
-  if (!req.user) {
-    return res.status(401).json({ message: "Unauthorized access" });
+app.get("/userStatus", (req, res) => {
+  if (req.isAuthenticated()) {
+    // If authenticated, return user profile information
+    return res.status(200).json({
+      loggedIn: true,
+      user: req.user,
+    });
+  } else {
+    // If not authenticated, return status only
+    return res.status(200).json({
+      loggedIn: false,
+    });
   }
-
-  // Assuming req.user contains user information
-  res.status(200).json({ user: req.user });
 });
-
-// app.get("/isAuthenticated", (req, res) => {
-//   if (req.isAuthenticated()) {
-//     res.json({ loggedIn: true });
-//   } else {
-//     res.json({ loggedIn: false });
-//   }
-// });
 
 // Function to perform geocoding using Mapbox API
 const geocode = async (location) => {

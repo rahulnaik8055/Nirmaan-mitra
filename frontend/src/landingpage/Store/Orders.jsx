@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import config from "../../../config";
-import useIsAuthenticated from "../../customHooks/isAuthenticated";
+import useUserProfile from "../../customHooks/userStatus";
 
 function Orders() {
   const [orders, setOrders] = useState([]);
-  const { isAuthenticated } = useIsAuthenticated(); // Use hook for authentication status
+  const { isAuthenticated } = useUserProfile(); // Use hook for authentication status
 
   // Fetch orders once the user is authenticated
   useEffect(() => {

@@ -3,7 +3,6 @@ import axios from "axios";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import Map from "../../Maps/Map";
 import LoadingSpinner from "../../OtherComponents/Loader";
-import useVerifyCookie from "../../customHooks/useVerifyCookie";
 import AppointedEngineer from "./AppointedEngineer";
 import { useFlashMessage } from "../../OtherComponents/FlashMessageContext";
 import config from "../../../config";

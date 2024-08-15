@@ -3,14 +3,14 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Project from "../Projects/Project";
 import config from "../../../config";
-import useIsAuthenticated from "../../customHooks/isAuthenticated"; // Ensure the path is correct
+import useUserProfile from "../../customHooks/userStatus";
 
 const ProfileEngineer = () => {
   const [profile, setProfile] = useState(null);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { isAuthenticated } = useIsAuthenticated(); // Ensure parentheses are included
+  const { isAuthenticated } = useUserProfile(); // Ensure parentheses are included
 
   useEffect(() => {
     if (!isAuthenticated) return;

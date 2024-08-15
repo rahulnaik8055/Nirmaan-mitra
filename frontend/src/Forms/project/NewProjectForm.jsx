@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { useFlashMessage } from "../../OtherComponents/FlashMessageContext";
 import LoadingSpinner from "../../OtherComponents/Loader";
 import config from "../../../config";
-import useIsAuthenticated from "../../customHooks/isAuthenticated";
+import useUserProfile from "../../customHooks/userStatus";
 
 function NewProject() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useIsAuthenticated();
+  const { isAuthenticated } = useUserProfile();
   const [formData, setFormData] = useState({
     ProjectName: "",
     description: "",

@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import Slider from "./Slider";
 import ShopCards from "./ShopCards";
 import Checkout from "./checkout";
-import useIsAuthenticated from "../../customHooks/isAuthenticated";
+import useUserProfile from "../../customHooks/userStatus";
 
 function StorePage() {
-  const { isAuthenticated } = useIsAuthenticated();
+  const { isAuthenticated } = useUserProfile();
   useEffect(() => {
     if (!isAuthenticated) {
       return;
