@@ -20,7 +20,7 @@ const useUserProfile = () => {
         });
 
         const { loggedIn, user } = response.data;
-        console.log(response.data);
+        console.log(response);
         setIsAuthenticated(loggedIn);
 
         if (loggedIn) {
