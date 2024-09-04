@@ -29,7 +29,7 @@ const authMiddleware = require("./Middlewares/AuthMiddleWare");
 
 app.use(
   cors({
-    origin: ["https://nirmaan-mitra-frontend.onrender.com"], // Replace with your exact frontend URL
+    origin: "*", // Replace with your exact frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
