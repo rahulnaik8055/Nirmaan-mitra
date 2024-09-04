@@ -86,13 +86,14 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: false,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    secure: true, // Set to true in production with HTTPS
-    sameSite: "lax", // Adjusted for testing; change to "None" in production with HTTPS
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    httpOnly: true, // Helps prevent XSS attacks
+    secure: process.env.NODE_ENV === "production", // Only set to true in production
+    sameSite: "None", // Allows cross-site cookie sharing, required when using secure cookies
   },
 };
+
 
 app.use(session(sessionOptions));
 
