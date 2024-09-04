@@ -3,10 +3,17 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const PORT = process.env.PORT || 3000;
-const url = process.env.MONGO_URL;
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const multer = require("multer");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const passport = require("./passportConfig"); // Import the configured passport
+
+// Importing models
 const { ProductsModel } = require("./models/ProductsModel");
 const { Project } = require("./models/ProjectModel");
 const { OrderModel } = require("./models/OrderModel");
@@ -14,19 +21,10 @@ const { Engineer } = require("./models/EngineerModel");
 const Employer = require("./models/EmployerModel");
 const User = require("./models/User");
 const Work = require("./models/Work");
-const axios = require("axios");
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const multer = require("multer");
-const session = require("express-session");
-const passport = require("./passportConfig"); // Import the configured passport
-const MongoStore = require("connect-mongo");
 const wrapAsync = require("./utils/wrapAsync");
-
-// Routes
-
 const authMiddleware = require("./Middlewares/AuthMiddleWare");
 
+// Middleware configuration
 app.use(
   cors({
     origin: ["https://nirmaan-mitra-frontend.onrender.com"], // Replace with your exact frontend URL
@@ -54,22 +52,22 @@ const parser = multer({ storage: storage });
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cookieParser());
-
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// MongoDB connection
 main()
   .then(() => {
-    console.log("connected successfully");
+    console.log("Connected successfully to MongoDB");
   })
   .catch((err) => {
-    console.log(err);
+    console.log("MongoDB connection error:", err);
   });
 
 async function main() {
   await mongoose.connect(process.env.MONGO_URL);
 }
 
+// Session configuration
 const store = MongoStore.create({
   mongoUrl: process.env.MONGO_URL,
   crypto: {
@@ -78,21 +76,21 @@ const store = MongoStore.create({
   touchAfter: 24 * 3600,
 });
 
-store.on("error", () => {
-  console.log("error occured in MongoSession", err);
+store.on("error", (err) => {
+  console.log("MongoSession error:", err);
 });
 
 const sessionOptions = {
   store,
   secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
     expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: false,
-    secure: false, // Temporarily disable secure for testing
-    sameSite: "None", // Cross-site cookies require this setting
+    httpOnly: true,
+    secure: true, // Set to true in production with HTTPS
+    sameSite: "lax", // Adjusted for testing; change to "None" in production with HTTPS
   },
 };
 
@@ -130,13 +128,20 @@ app.post("/login", (req, res, next) => {
         return next(err);
       }
 
-      console.log("Login - Session ID:", req.sessionID);
-      console.log("Login - Session Object:", req.session);
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return next(err);
+        }
 
-      res.json({
-        message: "Logged in successfully!",
-        user,
-        status: true,
+        console.log("Login - Session ID:", req.sessionID);
+        console.log("Login - Session Object:", req.session);
+
+        res.json({
+          message: "Logged in successfully!",
+          user,
+          status: true,
+        });
       });
     });
   })(req, res, next);
@@ -162,8 +167,17 @@ app.get("/userStatus", (req, res) => {
 // Logout route
 app.post("/logout", (req, res) => {
   req.logout((err) => {
-    if (err) return res.status(400).json({ error: err.message });
-    res.json({ message: "Logged out successfully!" });
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Session destruction error:", err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.clearCookie("connect.sid");
+      res.json({ message: "Logged out successfully!" });
+    });
   });
 });
 
